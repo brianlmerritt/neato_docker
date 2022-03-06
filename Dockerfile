@@ -44,6 +44,10 @@ RUN source /opt/ros/foxy/setup.bash && colcon build
 #RUN ros2 launch botvac_node test.py
 #RUN colcon build
 
+# Install python pyserial
+RUN apt install -y python3-pip
+RUN pip install pyserial
+
 COPY ros2_entrypoint.sh /root/.
 ENTRYPOINT ["/root/ros2_entrypoint.sh"]
 CMD ["bash"]
