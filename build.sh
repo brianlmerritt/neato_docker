@@ -1,2 +1,2 @@
 docker buildx use mybuilder
-docker buildx build --platform linux/amd64 -t brianlmerritt/neato_ros_foxy:latest --push .
+docker buildx build --no-cache --platform linux/amd64,linux/arm64 -t brianlmerritt/neato_ros_foxy:latest --push .
