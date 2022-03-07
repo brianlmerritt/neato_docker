@@ -1,7 +1,11 @@
 FROM ubuntu:20.04
 SHELL ["/bin/bash", "-c"]
-#RUN rm /bin/sh && ln -s /bin/bash /bin/sh
-RUN apt update && apt install -y locales
+# Setup new User
+RUN groupadd -r ros
+RUN useradd -r -g ros ros
+
+RUN apt update
+RUN apt install -y locales
 RUN locale-gen en_GB en_GB.UTF-8
 RUN update-locale LC_ALL=en_GB.UTF-8 LANG=en_GB.UTF-8
 RUN LANG=en_GB.UTF-8
@@ -24,13 +28,13 @@ RUN apt install -y librostest-dev python3-rostest
 RUN apt install -y ros-foxy-ros-testing
 RUN apt install -y ros-foxy-nav2-behavior-tree ros-foxy-behaviortree-cpp-v3
 
-WORKDIR /root/dev_ws/src
+WORKDIR /home/ros/dev_ws/src
 RUN git clone https://github.com/cpeavy2/botvac_node.git
 RUN git clone https://github.com/cpeavy2/neato_robot.git
 RUN git clone https://github.com/kobuki-base/cmd_vel_mux.git
 RUN git clone https://github.com/kobuki-base/velocity_smoother.git
 #RUN git clone -b foxy-devel https://github.com/ros-planning/navigation2.git
-WORKDIR /root/dev_ws
+WORKDIR /home/ros/dev_ws/
 
 
 #RUN apt-get install python3-rosdep2 -y
@@ -46,8 +50,13 @@ RUN source /opt/ros/foxy/setup.bash && colcon build
 
 # Install python pyserial
 RUN apt install -y python3-pip
-RUN pip install pyserial
+RUN apt install ros-foxy-xacro
+COPY ros2_entrypoint.sh /home/ros/ros2_entrypoint.sh
 
-COPY ros2_entrypoint.sh /root/.
-ENTRYPOINT ["/root/ros2_entrypoint.sh"]
+RUN chmod +774 /home/ros/ros2_entrypoint.sh
+RUN chown -R ros:ros /home/ros
+
+USER ros
+
+ENTRYPOINT ["/home/ros/ros2_entrypoint.sh"]
 CMD ["bash"]
